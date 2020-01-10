@@ -3,7 +3,7 @@ const fs = require("fs");
 const glob = require("glob");
 const parser = require("junit-xml-parser").parser;
 
-let output = "summary";
+let output = "status";
 if (process.argv.length > 2) {
   output = process.argv[2];
 }
