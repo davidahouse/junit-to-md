@@ -34,8 +34,13 @@ glob("**/TEST*.xml", async function(err, files) {
 
   if (output === "text") {
     outputText();
-  } else {
+  } else if (output === "summary") {
     outputSummary();
+  } else {
+    if (failedTests > 0) {
+      console.log("Failing tests detected, so returning a non-zero exit code");
+      process.exit(1);
+    }
   }
 });
 
