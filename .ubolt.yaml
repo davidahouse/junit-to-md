@@ -1,0 +1,8 @@
+newversion:
+  commands:
+    - npm --no-git-tag-version version $1
+    - npm install
+  description: Update the package.json with a new version
+version:
+  command: npm view junit-to-md version
+  description: Show the current version of the package
