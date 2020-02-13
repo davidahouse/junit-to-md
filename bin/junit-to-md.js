@@ -40,6 +40,9 @@ glob("**/TEST*.xml", async function(err, files) {
     if (failedTests > 0) {
       console.log("Failing tests detected, so returning a non-zero exit code");
       process.exit(1);
+    } else if (totalTests == 0) {
+      console.log("No tests detected, so returning a non-zero exit code");
+      process.exit(1);
     }
   }
 });
