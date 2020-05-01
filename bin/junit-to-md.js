@@ -12,7 +12,7 @@ let totalTests = 0;
 let failedTests = 0;
 let failedTestDetails = [];
 
-glob("**/TEST*.xml", async function(err, files) {
+glob("**/TEST*.xml", async function (err, files) {
   // console.dir(files);
   for (let index = 0; index < files.length; index++) {
     const junitresults = await parser.parse(fs.readFileSync(files[index]));
@@ -22,11 +22,22 @@ glob("**/TEST*.xml", async function(err, files) {
     if (junitresults.suite.summary.failures > 0) {
       for (let tindex = 0; tindex < junitresults.suite.tests.length; tindex++) {
         if (junitresults.suite.tests[tindex].failure != null) {
-          failedTestDetails.push(
-            junitresults.suite.name +
-              "/" +
-              junitresults.suite.tests[tindex].name
-          );
+          if (junitresults.suite.tests[tindex].failure.message != null) {
+            failedTestDetails.push(
+              junitresults.suite.name +
+                "/" +
+                junitresults.suite.tests[tindex].name +
+                "\n\n```" +
+                junitresults.suite.tests[tindex].failure.message +
+                "\n```"
+            );
+          } else {
+            failedTestDetails.push(
+              junitresults.suite.name +
+                "/" +
+                junitresults.suite.tests[tindex].name
+            );
+          }
         }
       }
     }
