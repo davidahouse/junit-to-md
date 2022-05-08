@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 const fs = require("fs");
 const glob = require("glob");
-const parser = require("junit-xml-parser").parser;
+const libxmljs = require("libxmljs2");
 
 let output = "status";
 if (process.argv.length > 2) {
@@ -13,34 +13,28 @@ let failedTests = 0;
 let failedTestDetails = [];
 
 glob("**/TEST*.xml", async function (err, files) {
-  // console.dir(files);
   for (let index = 0; index < files.length; index++) {
-    const junitresults = await parser.parse(fs.readFileSync(files[index]));
-    //        console.dir(junitresults);
-    totalTests += junitresults.suite.summary.tests;
-    failedTests += junitresults.suite.summary.failures;
-    if (junitresults.suite.summary.failures > 0) {
-      for (let tindex = 0; tindex < junitresults.suite.tests.length; tindex++) {
-        if (junitresults.suite.tests[tindex].failure != null) {
-          if (junitresults.suite.tests[tindex].failure.message != null) {
+    var xmlDoc = libxmljs.parseXml(fs.readFileSync(files[index]));
+    var suites = xmlDoc.find("//testsuite");
+    suites.forEach((suite) => {
+      totalTests += parseInt(suite.attr("tests").value());
+      failedTests += parseInt(suite.attr("failures").value());
+      var tests = suite.find("//testcase");
+      tests.forEach((test) => {
+        test.childNodes().forEach((failure) => {
+          if (failure.name() === "failure") {
             failedTestDetails.push(
-              junitresults.suite.name +
+              suite.attr("name").value() +
                 "/" +
-                junitresults.suite.tests[tindex].name +
-                "\n\n```" +
-                junitresults.suite.tests[tindex].failure.message +
+                test.attr("name").value() +
+                "\n\n```\n" +
+                failure.text() +
                 "\n```"
             );
-          } else {
-            failedTestDetails.push(
-              junitresults.suite.name +
-                "/" +
-                junitresults.suite.tests[tindex].name
-            );
           }
-        }
-      }
-    }
+        });
+      });
+    });
   }
 
   if (output === "text") {
