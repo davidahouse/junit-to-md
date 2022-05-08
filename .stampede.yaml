@@ -4,7 +4,6 @@ pullrequests:
       config:
         prMilestoneCheck: true
     - id: lint-nodejs
-    - id: unit-tests-nodejs
 releases:
   published:
     tasks:
