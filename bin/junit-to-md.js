@@ -10,7 +10,9 @@ if (process.argv.length > 2) {
 
 let totalTests = 0;
 let failedTests = 0;
+let slowestCount = 5;
 let failedTestDetails = [];
+let allTests = [];
 
 glob("**/TEST*.xml", async function (err, files) {
   for (let index = 0; index < files.length; index++) {
@@ -21,6 +23,7 @@ glob("**/TEST*.xml", async function (err, files) {
       failedTests += parseInt(suite.attr("failures").value());
       var tests = suite.find("//testcase");
       tests.forEach((test) => {
+        allTests.push(test)
         test.childNodes().forEach((failure) => {
           if (failure.name() === "failure") {
             failedTestDetails.push(
@@ -41,6 +44,8 @@ glob("**/TEST*.xml", async function (err, files) {
     outputText();
   } else if (output === "summary") {
     outputSummary();
+  } else if (output === "slowest") {
+    outputSlowest(slowestCount);
   } else {
     if (failedTests > 0) {
       console.log("Failing tests detected, so returning a non-zero exit code");
@@ -71,4 +76,16 @@ function outputSummary() {
   console.log("- " + totalTests + " Total test(s)");
   console.log("- " + (totalTests - failedTests) + " Successful test(s)");
   console.log("- " + failedTests + " Failed test(s)");
+}
+
+function outputSlowest(slowestCount) {
+  allTests.sort((a, b) => parseFloat(b.attr('time').value()) - parseFloat(a.attr('time').value()))
+  let slowestTests = allTests.slice(0, slowestCount);
+  console.log(" ");
+  console.log(`### ${slowestCount} Slowest Tests`);
+  console.log("|Test name|Test duration|");
+  console.log("|:----|:----|");
+  slowestTests.forEach(test => {
+    console.log(`| ${test.attr('name').value()} | ${parseFloat(test.attr('time').value()).toFixed(2)} |`);
+  });
 }
