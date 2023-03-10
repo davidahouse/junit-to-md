@@ -83,7 +83,7 @@ function outputSlowest(slowestCount) {
   let slowestTests = allTests.slice(0, slowestCount);
   console.log(" ");
   console.log(`### ${slowestCount} Slowest Tests`);
-  console.log("|Test name|Test duration|");
+  console.log("|Test name|Test duration(seconds)|");
   console.log("|:----|:----|");
   slowestTests.forEach(test => {
     console.log(`| ${test.attr('name').value()} | ${parseFloat(test.attr('time').value()).toFixed(2)} |`);
